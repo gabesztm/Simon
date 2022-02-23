@@ -1,0 +1,127 @@
+﻿<Window x:Class="SimonUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SimonUI"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="Simon" Height="500" Width="900"
+        d:DataContext="{d:DesignInstance Type=local:ViewModel, IsDesignTimeCreatable=True}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <system:Double x:Key="lampSideLength">150</system:Double>
+            <GridLength x:Key="gridSideLength">200</GridLength>
+            <Style x:Key="LampStyle" TargetType="Button">
+                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Name="border" 
+                        BorderThickness="1"
+                        Padding="4,2" 
+                        BorderBrush="DarkGray" 
+                        CornerRadius="3" 
+                        Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <local:BoolToColorConverter x:Key="colorConverter"/>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="15"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="Play level" Command="{Binding PlayLevelCommand}"/>
+                    <TextBlock Grid.Column="1" Text="Score" TextAlignment="Right" VerticalAlignment="Center" Margin="10,0"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Score, StringFormat=N0}" VerticalAlignment="Center"/>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="1" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{StaticResource gridSideLength}"/>
+                    <RowDefinition Height="{StaticResource gridSideLength}"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource gridSideLength}"/>
+                    <ColumnDefinition Width="{StaticResource gridSideLength}"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource LampStyle}" Width="{StaticResource lampSideLength}" Height="{StaticResource lampSideLength}" Background="{Binding IsNr1Lit, Converter={StaticResource colorConverter}, ConverterParameter='46,139,87|124,252,0'}" Command="{Binding Lamp1Command}"/>
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource LampStyle}" Width="{StaticResource lampSideLength}" Height="{StaticResource lampSideLength}" Background="{Binding IsNr2Lit, Converter={StaticResource colorConverter}, ConverterParameter='255,99,71|255,0,0'}"  Command="{Binding Lamp2Command}"/>
+                <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource LampStyle}" Width="{StaticResource lampSideLength}" Height="{StaticResource lampSideLength}" Background="{Binding IsNr3Lit, Converter={StaticResource colorConverter}, ConverterParameter='255,255,153|255,255,0'}" Command="{Binding Lamp3Command}"/>
+                <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource LampStyle}" Width="{StaticResource lampSideLength}" Height="{StaticResource lampSideLength}" Background="{Binding IsNr4Lit, Converter={StaticResource colorConverter}, ConverterParameter='70,130,180|0,191,255'}" Command="{Binding Lamp4Command}"/>
+            </Grid>
+        </Grid>
+        <ListView Grid.Column="2"
+                  ItemsSource="{Binding Scores}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Focusable" Value="false"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Score, StringFormat=N0}"/>
+                        <TextBlock Grid.Column="2" Text="{Binding CreationTime}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <Grid Grid.Column="1" Grid.ColumnSpan="2" Visibility="{Binding IsScoreInputVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+              Background="White" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"  Grid.ColumnSpan="3" HorizontalAlignment="Center" Text="Enter your name" Height="60" />
+
+            <Grid Grid.Row="1" Height="20" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Width="80" HorizontalAlignment="Right" Text="{Binding PlayerName, Mode=OneWayToSource}"/>
+                <TextBlock Grid.Column="1" Text="Score: " FontStyle="Oblique" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="2" Text="{Binding Score, StringFormat=N0}" HorizontalAlignment="Left"/>
+            </Grid>
+            
+            
+            <Button Grid.Row="2" Content="Submit" Width="100" Height="50" Command="{Binding SubmitCommand}"/>
+        </Grid>
+    </Grid>
+</Window>
